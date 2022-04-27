@@ -8,11 +8,11 @@ private:
 public:
 
 
-  void initialize_cameras_location(std::vector<double>);
+  double calculate_cameras_speed(std::vector<double>);
   
-  //double calculate_cameras_scalar_speed();
+  std::vector<double> cartesian_components_inc_ray_cameras_reference(double, double);
 
-  
+  std::vector<double> cartesian_components_inc_ray_fido_reference(double, std::vector<double>);
   
 
 

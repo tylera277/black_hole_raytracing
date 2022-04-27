@@ -5,9 +5,9 @@ class MathFormula{
   
 public:
 
-  double sigma(double, double, double, double);
+  double sigma(double, double, double);
 
-  double del(double, double);
+  double del(double, double, double);
 
   double rho(double, double, double);
 
@@ -17,5 +17,6 @@ public:
 
   double omega_bar(double, double, double);
 
+  double Omega(double, double, double);
 
 };
