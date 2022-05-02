@@ -111,3 +111,66 @@ std::vector<double> RayTracing::spherical_components_inc_ray_fido_reference(std:
   return nf_spherical;
     
 }
+
+std::vector<double> RayTracing::rays_canonical_momenta(std::vector<double> cameras_orbital_components,
+						       std::vector<double> spherical_comp_ray_wrt_fido_reference)
+{
+  
+  MathFormula MF;
+
+  double r_c = cameras_orbital_components.at(0);
+  double theta_c = cameras_orbital_components.at(1);
+  double phi_c = cameras_orbital_components.at(2);
+  double angular_momentum = cameras_orbital_components.at(3);
+
+  double kerr_metric = angular_momentum;
+  
+  double energy_f = MF.energy_f(r_c,
+				 kerr_metric,
+				 theta_c,
+				 spherical_comp_ray_wrt_fido_reference.at(2));
+
+
+  double p_t = -1;
+  
+  double p_r = energy_f * (MF.rho(r_c, kerr_metric, theta_c)/pow(MF.del(r_c, kerr_metric, theta_c),1.0/2.0)) * spherical_comp_ray_wrt_fido_reference.at(0);
+
+			   
+  double p_theta = energy_f * MF.rho(r_c, kerr_metric, theta_c) * spherical_comp_ray_wrt_fido_reference.at(1);
+			
+  double p_phi = energy_f * MF.omega_bar(r_c, kerr_metric, theta_c)*spherical_comp_ray_wrt_fido_reference.at(2);
+
+  std::vector<double> ray_momenta;
+  ray_momenta.push_back(p_t);
+  ray_momenta.push_back(p_r);
+  ray_momenta.push_back(p_theta);
+  ray_momenta.push_back(p_phi);
+
+  return ray_momenta;
+}
+
+
+std::vector<double> RayTracing::axial_ang_mom_carter_constant(std::vector<double> camera_orbital_comps,
+							      std::vector<double> rays_canonical_momenta)
+{
+  double r_c = camera_orbital_comps.at(0);
+  double theta_c = camera_orbital_comps.at(1);
+  double phi_c = camera_orbital_comps.at(2);
+  double angular_momentum = camera_orbital_comps.at(3);
+
+  double kerr_metric = angular_momentum;
+  
+  
+  // Axial angular momentum
+  double b = rays_canonical_momenta.at(2);
+
+  // Carter Constant
+  double q = rays_canonical_momenta.at(1) + pow(cos(theta_c),2)*((pow(b,2)/pow(sin(theta_c),2)
+								  - pow(kerr_metric,2)));
+
+  std::vector<double> constants;
+  constants.push_back(b);
+  constants.push_back(q);
+
+  return constants;
+}

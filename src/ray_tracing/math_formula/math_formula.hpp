@@ -19,4 +19,6 @@ public:
 
   double Omega(double, double, double);
 
+  double energy_f(double, double, double, double);
+  
 };

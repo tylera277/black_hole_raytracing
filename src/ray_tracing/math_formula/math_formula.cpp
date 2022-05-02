@@ -92,3 +92,16 @@ double MathFormula::Omega(double radius, double kerr_metric, double theta){
 
   return result;
 }
+
+double MathFormula::energy_f(double radius, double kerr_metric, double theta, double phi_comp_little_n){
+
+  double alpha_ = this->alpha(radius, kerr_metric, theta);
+  double omega_ = this->omega(radius, kerr_metric, theta);
+  double omega_bar_ = this->omega_bar(radius, kerr_metric, theta);
+
+  double result = 1 / (alpha_ + omega_ * omega_bar_ * phi_comp_little_n);
+
+  return result;
+
+
+}

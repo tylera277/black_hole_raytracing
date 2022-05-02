@@ -19,6 +19,10 @@ public:
   std::vector<double> spherical_components_inc_ray_fido_reference(std::vector<double>,
 								  std::vector<double>);
   
-
+  std::vector<double> rays_canonical_momenta(std::vector<double>,
+					     std::vector<double>);
+  std::vector<double> axial_ang_mom_carter_constant(std::vector<double>,
+						    std::vector<double>);
+  
 
 };
