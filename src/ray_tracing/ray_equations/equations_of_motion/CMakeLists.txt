@@ -1,0 +1,2 @@
+
+add_library(equations_of_motion STATIC equations_of_motion.cpp equations_of_motion.hpp)

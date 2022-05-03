@@ -3,21 +3,27 @@
 #include <iostream>
 
 #include "ray_tracing/ray_tracing.hpp"
-
+#include "ray_tracing/ray_equations/ray_equations.hpp"
 
 int main(){
   
   RayTracing ray_trace;
+  RayEquations ray_equations;
 
   std::vector<double> cameras_orbital_components;
+  double r_c = 1e10;
+  double theta_c = 0;
+  double phi_c = 0;
 
+  double kerr_constant = 1;
+  
   // R, theta, phi of cameras location
-  cameras_orbital_components.push_back(1e10);
-  cameras_orbital_components.push_back(0);
-  cameras_orbital_components.push_back(0);
+  cameras_orbital_components.push_back(r_c);
+  cameras_orbital_components.push_back(theta_c);
+  cameras_orbital_components.push_back(phi_c);
 
   // Angular momentum of spinning black hole
-  cameras_orbital_components.push_back(1);
+  cameras_orbital_components.push_back(kerr_constant);
 
 
   //Step 1a
@@ -89,7 +95,10 @@ int main(){
 	    Calculating the ray's other two conserved quantities, b, the axial angular momentum and
 	    q, the Carter constant.
 	   */
-	  constants = ray_trace.axial_ang_mom_carter_constant(camera_orbital_components,
+
+	  std::vector<double> constants;
+	  
+	  constants = ray_trace.axial_ang_mom_carter_constant(cameras_orbital_components,
 							      rays_canonical_momenta);
 
 	  double b = constants.at(0);
@@ -111,12 +120,36 @@ int main(){
 	    you then take the pixel readings at that location and put them into a log as the pixel readings
 	    at its intensity for those pair of initial angles in the camera reference frame.
 
-	    -A future step is to adjust the intensity of the 
+	    -A future step is to adjust the intensity of the light...
 	   */
 
-	  
+	  // The angles of the point at which the ray ends up on the celestial sphere
+	  double theta_prime;
+	  double phi_prime;
+	  std::vector<double> celestial_sphere_angle;
 
+
+	  // There is definitely a better way to do this than this monstrosity.
+	  std::vector<double> initial_conditions;
+	  initial_conditions.push_back(r_c);
+	  initial_conditions.push_back(theta_c);
+	  initial_conditions.push_back(phi_c);
+	    
+	  initial_conditions.insert(initial_conditions.end(),
+				    rays_canonical_momenta.begin(),
+				    rays_canonical_momenta.end());
+
+	  initial_conditions.push_back(kerr_constant);
+
+	  initial_conditions.push_back(b);
+	  initial_conditions.push_back(q);
 	  
+	  celestial_sphere_angle = ray_equations.integrate_ray_equations(initial_conditions);
+
+	  // The angles on the celestial sphere where the ray coming from the camera,
+	  // ultimately ended up.
+	  theta_prime = celestial_sphere_angle.at(0);
+	  phi_prime = celestial_sphere_angle.at(1);
 
 	  
 	  theta_cs += (3.14159/180.0);
