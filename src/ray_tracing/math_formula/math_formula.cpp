@@ -84,7 +84,8 @@ double MathFormula::omega_bar(double radius, double kerr_metric, double theta)
   return result;
 }
 
-double MathFormula::Omega(double radius, double kerr_metric, double theta){
+double MathFormula::Omega(double radius, double kerr_metric, double theta)
+{
   double top = 1;
   double bottom = kerr_metric + pow(radius, 3.0/2.0);
 

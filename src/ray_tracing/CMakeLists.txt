@@ -8,5 +8,4 @@ add_subdirectory("ray_equations")
 target_link_libraries(ray_tracing PUBLIC math_formula)
 target_link_libraries(ray_tracing PUBLIC ray_equations)
 
-include_directories("/usr/local/include/eigen3")
 

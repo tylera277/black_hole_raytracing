@@ -1,4 +1,6 @@
 
+#include <iostream>
+
 #include "ray_equations.hpp"
 #include "equations_of_motion/equations_of_motion.hpp"
 
@@ -6,6 +8,8 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
 							  initial_conditions){
 
   EquationsOfMotion EOM;
+
+  std::vector<double> celestial_sphere_angles;
   
   // Unpacking all of the initial conditions
   double r = initial_conditions.at(0);
@@ -23,12 +27,125 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
   
   // Time conditions which I am integrating over
   double eta = 0;
-  double eta_f = 1e5;
+  double eta_f = -1e2;
+
+  // Im going to try a one step size fits all approach, may need to
+  // adjust in future.
+  // * For the partial derivative estimates * 
+  double partial_der_step_size = 0.0001;
+
+  // Step size for time integration
+  double time_step_size = 1;
   
-  while(eta<eta_f){
-  
+  std::cout << "INITIAL ANGLES: "<< theta << " , " << phi << "\n";
+
+  while(eta>eta_f){
+
+    
+    
+    /*
     double dr_deta = EOM.dr_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
-  
+    double dtheta_deta = EOM.dtheta_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
+
+    double dphi_deta = EOM.dphi_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
+				     partial_der_step_size);
+
+    double dpr_deta = EOM.dpr_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
+				   partial_der_step_size);
+
+    double dptheta_deta = EOM.dptheta(r,theta,kerr_constant,b,q,p_r,p_theta,
+				      partial_der_step_size);
+				      
+				      
+    */
+
+    // Initial Slopes
+    double a1 = time_step_size*EOM.dr_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
+    double b1 = time_step_size*EOM.dtheta_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
+
+    double c1 = time_step_size*EOM.dphi_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
+					     partial_der_step_size);
+
+    double d1 = time_step_size*EOM.dpr_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
+					    partial_der_step_size);
+
+    double e1 = time_step_size*EOM.dptheta_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
+						partial_der_step_size);
+    //////
+
+    // Middle slopes
+    double a2 = time_step_size * EOM.dr_deta(r+0.5*a1, theta+0.5*b1, kerr_constant,
+					     b, q, p_r+0.5*d1, p_theta+0.5*e1);
+    
+    double b2 = time_step_size * EOM.dtheta_deta(r+0.5*a1, theta+0.5*b1, kerr_constant,
+						 b, q, p_r+0.5*d1, p_theta+0.5*e1);
+
+    double c2 = time_step_size * EOM.dphi_deta(r+0.5*a1, theta+0.5*b1, kerr_constant,
+					     b, q, p_r+0.5*d1, p_theta+0.5*e1,
+					     partial_der_step_size);
+    
+    double d2 = time_step_size * EOM.dpr_deta(r+0.5*a1, theta+0.5*b1, kerr_constant,
+					    b, q, p_r+0.5*d1, p_theta+0.5*e1,
+					    partial_der_step_size);
+    double e2 = time_step_size * EOM.dptheta_deta(r+0.5*a1, theta+0.5*b1, kerr_constant,
+						b, q, p_r+0.5*d1, p_theta+0.5*e1,
+						partial_der_step_size);
+
+    
+    double a3 = time_step_size * EOM.dr_deta(r+0.5*a2, theta+0.5*b2, kerr_constant,
+					     b, q, p_r+0.5*d2, p_theta+0.5*e2);
+    
+    double b3 = time_step_size * EOM.dtheta_deta(r+0.5*a2, theta+0.5*b2, kerr_constant,
+					       b, q, p_r+0.5*d2, p_theta+0.5*e2);
+
+    double c3 = time_step_size * EOM.dphi_deta(r+0.5*a2, theta+0.5*b2, kerr_constant,
+					     b, q, p_r+0.5*d2, p_theta+0.5*e2,
+					     partial_der_step_size);
+    
+    double d3 = time_step_size * EOM.dpr_deta(r+0.5*a2, theta+0.5*b2, kerr_constant,
+					    b, q, p_r+0.5*d2, p_theta+0.5*e2,
+					    partial_der_step_size);
+    double e3 = time_step_size * EOM.dptheta_deta(r+0.5*a2, theta+0.5*b2, kerr_constant,
+						b, q, p_r+0.5*d2, p_theta+0.5*e2,
+						partial_der_step_size);
+
+    // Final slopes
+
+    double a4 = time_step_size * EOM.dr_deta(r+a3, theta+b3, kerr_constant,
+					     b, q, p_r+d3, p_theta+e3);
+    
+    double b4 = time_step_size * EOM.dtheta_deta(r+a3, theta+b3, kerr_constant,
+					       b, q, p_r+d3, p_theta+e3);
+
+    double c4 = time_step_size * EOM.dphi_deta(r+a3, theta+b3, kerr_constant,
+					     b, q, p_r+d3, p_theta+e3,
+					     partial_der_step_size);
+    
+    double d4 = time_step_size * EOM.dpr_deta(r+a3, theta+b3, kerr_constant,
+					    b, q, p_r+d3, p_theta+e3,
+					    partial_der_step_size);
+    double e4 = time_step_size * EOM.dptheta_deta(r+a3, theta+b3, kerr_constant,
+						b, q, p_r+d3, p_theta+e3,
+						partial_der_step_size);
+
+
+
+    // Updating the values
+    r += (1.0/6.0) * (a1 + 2*a2 + 2*a3 + a4);
+    theta += (1.0/6.0) * (b1 + 2*b2 + 2*b3 + b4);
+    phi += (1.0/6.0) * (c1 + 2*c2 + 2*c3 + c4);
+    p_r += (1.0/6.0) * (d1 + 2*d2 + 2*d3 + d4);
+    p_theta += (1.0/6.0) * (e1+ 2*e2 + 2*e3 + e4);
+    
+
+    std::cout << "ANGLES: "<< r << " , " << theta << " , " << phi << "\n";
+    
+    eta -= time_step_size;
   }
+
+  celestial_sphere_angles.push_back(theta);
+  celestial_sphere_angles.push_back(phi);
+
+  return celestial_sphere_angles;
   
 }

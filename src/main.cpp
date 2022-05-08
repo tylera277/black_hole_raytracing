@@ -4,6 +4,10 @@
 
 #include "ray_tracing/ray_tracing.hpp"
 #include "ray_tracing/ray_equations/ray_equations.hpp"
+//#include "catch.hpp"
+
+
+
 
 int main(){
   
@@ -11,8 +15,8 @@ int main(){
   RayEquations ray_equations;
 
   std::vector<double> cameras_orbital_components;
-  double r_c = 1e10;
-  double theta_c = 0;
+  double r_c = 1e11;
+  double theta_c = 3.14159/2.0;
   double phi_c = 0;
 
   double kerr_constant = 1;
@@ -29,13 +33,16 @@ int main(){
   //Step 1a
   /*
     Calculating the speed of the camera w.r.t. the FIDO at its location
+    # Sort of tested #
    */
   double beta_speed = ray_trace.calculate_cameras_speed(cameras_orbital_components);
+  std::cout << "SPEED:" << beta_speed << "\n";
   
+
   // The angles from which light rays will emanate w.r.t. the
   // cameras local sky.
-  double phi_cs = 3.14159/4.0;
-  double theta_cs = 3.14159/4.0;
+  double phi_cs = 3.14159/2.0;
+  double theta_cs = 3.14159/2.0;
 
   std::vector<double> cameras_comp_relative_to_fido;
   std::vector<double> cart_comp_inc_ray_cameras_reference;
@@ -52,19 +59,24 @@ int main(){
   cameras_comp_relative_to_fido = ray_trace.cameras_comp_of_motion_wrt_fido(); 
   
   
-  while(phi_cs < ((2*3.14159)+3.14159/4.0))
-    {
-      while(theta_cs < ((2*3.14159)+3.14159/4.0))
-	{
+  //while(phi_cs < ((2*3.14159)+3.14159/4.0))
+  // {
+  // while(theta_cs < ((2*3.14159)+3.14159/4.0))
+  //	{
+
 	  
 	  //Step 2
 	  /*
 	    Computing, in the cameras reference frame, the cartesian components of the unit vector
 	    N that points in the direction of the incoming ray.
+
+	    # Sort of tested #
 	   */
+  
 	  cart_comp_inc_ray_cameras_reference =
 	    ray_trace.cartesian_components_inc_ray_cameras_reference(theta_cs, phi_cs);
 
+	  
 	  
 	  //Step 3a
 	  /*
@@ -132,13 +144,18 @@ int main(){
 	  // There is definitely a better way to do this than this monstrosity.
 	  std::vector<double> initial_conditions;
 	  initial_conditions.push_back(r_c);
-	  initial_conditions.push_back(theta_c);
-	  initial_conditions.push_back(phi_c);
-	    
+	  initial_conditions.push_back(theta_cs);
+	  initial_conditions.push_back(phi_cs);
+
+	  initial_conditions.push_back(rays_canonical_momenta.at(1));
+	  initial_conditions.push_back(rays_canonical_momenta.at(2));
+	  initial_conditions.push_back(rays_canonical_momenta.at(3));
+	  
+	  /* 
 	  initial_conditions.insert(initial_conditions.end(),
 				    rays_canonical_momenta.begin(),
 				    rays_canonical_momenta.end());
-
+	  */
 	  initial_conditions.push_back(kerr_constant);
 
 	  initial_conditions.push_back(b);
@@ -151,11 +168,12 @@ int main(){
 	  theta_prime = celestial_sphere_angle.at(0);
 	  phi_prime = celestial_sphere_angle.at(1);
 
-	  
+	  /* 
 	  theta_cs += (3.14159/180.0);
-	}
+	 	}
       phi_cs += (3.14159/180.0);
-    }
+     }
+	  */
 
 
 }

@@ -1,3 +1,6 @@
+#ifndef RAY_TRACING_H
+#define RAY_TRACING_H
+
 #include <vector>
 
 
@@ -6,7 +9,9 @@ class RayTracing{
 private:
 
 public:
+  RayTracing(){};
 
+  ~RayTracing(){};
 
   double calculate_cameras_speed(std::vector<double>);
 
@@ -26,3 +31,5 @@ public:
   
 
 };
+
+#endif

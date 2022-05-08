@@ -1,11 +1,13 @@
+#include "ray_tracing.hpp"
+#include "math_formula/math_formula.hpp"
 
-#include <Eigen/Dense>
+
 #include <cmath>
 #include <cassert>
 #include <iostream>
+#include <vector>
 
-#include "ray_tracing.hpp"
-#include "math_formula/math_formula.hpp"
+
 
 double RayTracing::calculate_cameras_speed(std::vector<double> components)
 {
