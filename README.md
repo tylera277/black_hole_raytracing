@@ -3,7 +3,7 @@
 -I just updated the Runge-Kutta method to Runge-Kutta-Fehlberg for supposed improved accuracy, still 
 need to test to make sure I implemented it correctly for many variables.  
 -I just wrote a quick python script to analyze what my program is outputting at the moment, and the original picture I calculated for is attached below.   
--Then the second picture is what my program output for a small slice of the picture, with a supposed black hole in front of it.
+-Then the second picture is what my program output for a small slice of the picture, with a supposed black hole in front of it.  
 -The last picture is a zoomed in version of the small slice which seems to show some kind of optical effect taking place, I believe
 this warrants a bigger slice being calculated.  
 
