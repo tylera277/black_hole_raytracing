@@ -22,7 +22,7 @@ double EquationsOfMotion::dtheta_deta(double r, double theta, double a, double b
 				      double q, double p_r, double p_theta){
   MathFormula MF;
 
-  double result = 1 / pow(MF.rho(r,a,theta),2) * p_theta;
+  double result = (1 / pow(MF.rho(r,a,theta),2)) * p_theta;
 
   return result;
 
@@ -111,7 +111,7 @@ double EquationsOfMotion::dphi_deta(double r, double theta, double a, double b,
   double dphi_deta_minus_step = this->dphi_deta_step1(r,theta,a,b-step_size,q,p_r,p_theta);
   double dphi_deta = (dphi_deta_plus_step - dphi_deta_minus_step) / (2 * step_size);
 
-  return dphi_deta;
+  return (-dphi_deta);
 }
 
 double EquationsOfMotion::dpr_deta(double r, double theta, double a, double b,

@@ -1,9 +1,10 @@
 
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 #include "ray_tracing/ray_tracing.hpp"
-#include "ray_tracing/ray_equations/ray_equations.hpp"
+#include "ray_tracing/ray_equations/ray_equations2.hpp"
 //#include "catch.hpp"
 
 
@@ -14,10 +15,22 @@ int main(){
   RayTracing ray_trace;
   RayEquations ray_equations;
 
+  // Dimensions of the picture which I will place the black hole
+  // in front of.
+  double picture_width=4162;
+  double picture_height=4101;
+
+  // File which I am outputting the calculations to
+  std::ofstream angles;
+  angles.open("../angles_rkf4.csv");
+
+  angles << "theta_cs, phi_cs, theta_prime, phi_prime\n";
+
+  
   std::vector<double> cameras_orbital_components;
-  double r_c = 1e11;
+  double r_c = 5e6;
   double theta_c = 3.14159/2.0;
-  double phi_c = 0;
+  double phi_c = 3.14159;
 
   double kerr_constant = 1;
   
@@ -36,14 +49,13 @@ int main(){
     # Sort of tested #
    */
   double beta_speed = ray_trace.calculate_cameras_speed(cameras_orbital_components);
-  std::cout << "SPEED:" << beta_speed << "\n";
+  //std::cout << "SPEED:" << beta_speed << "\n";
   
 
   // The angles from which light rays will emanate w.r.t. the
   // cameras local sky.
-  double phi_cs = 3.14159/2.0;
-  double theta_cs = 3.14159/2.0;
-
+  double theta_cs = 3.14159/2.0, phi_cs =3.14159/2.0;
+  
   std::vector<double> cameras_comp_relative_to_fido;
   std::vector<double> cart_comp_inc_ray_cameras_reference;
   std::vector<double> cart_comp_inc_ray_fido_reference;
@@ -59,10 +71,11 @@ int main(){
   cameras_comp_relative_to_fido = ray_trace.cameras_comp_of_motion_wrt_fido(); 
   
   
-  //while(phi_cs < ((2*3.14159)+3.14159/4.0))
-  // {
-  // while(theta_cs < ((2*3.14159)+3.14159/4.0))
-  //	{
+  while(phi_cs <= ((3.14159/2.0)+200*((2*3.14159)/picture_width)))
+    {
+      theta_cs =(3.14159/2.0);
+      while(theta_cs <= ((3.14159/2.0)+200*(3.14159)/picture_height))
+  	{
 
 	  
 	  //Step 2
@@ -167,13 +180,30 @@ int main(){
 	  // ultimately ended up.
 	  theta_prime = celestial_sphere_angle.at(0);
 	  phi_prime = celestial_sphere_angle.at(1);
+	  std::cout <<"PHI: " << phi_prime << " THETA: " << theta_prime << "\n";
+	  
 
-	  /* 
-	  theta_cs += (3.14159/180.0);
-	 	}
-      phi_cs += (3.14159/180.0);
+	  // Printing out the angles to a csv file for processing in a
+	  // python file
+	  angles << theta_cs << "," << phi_cs << ",";
+	  angles << theta_prime << "," << phi_prime << "\n";
+	  
+
+	  
+
+
+	  
+	  //theta_cs += (100*(3.14159/picture_width));
+	  theta_cs += ((3.14159/picture_height));
+
+	}
+      //phi_cs += (100*((2*3.14159)/picture_height));
+      phi_cs += (((2*3.14159)/picture_width));
+
      }
-	  */
+  
+	 
 
+  angles.close();
 
 }
