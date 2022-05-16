@@ -41,23 +41,6 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
   while(eta>eta_f){
 
     
-    
-    /*
-    double dr_deta = EOM.dr_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
-    double dtheta_deta = EOM.dtheta_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
-
-    double dphi_deta = EOM.dphi_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
-				     partial_der_step_size);
-
-    double dpr_deta = EOM.dpr_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
-				   partial_der_step_size);
-
-    double dptheta_deta = EOM.dptheta(r,theta,kerr_constant,b,q,p_r,p_theta,
-				      partial_der_step_size);
-				      
-				      
-    */
-
     // Initial Slopes
     double a1 = time_step_size*EOM.dr_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
     double b1 = time_step_size*EOM.dtheta_deta(r,theta,kerr_constant,b,q,p_r,p_theta);

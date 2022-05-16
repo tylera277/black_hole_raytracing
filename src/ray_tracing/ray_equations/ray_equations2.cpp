@@ -45,7 +45,7 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
   double time_step_size = 100;
   double dt = time_step_size;
   
-  std::cout << "TIME: " << dt << "\n";
+  //std::cout << "TIME: " << dt << "\n";
   std::cout << "INITIAL ANGLES: " << theta <<"; " << phi<<"\n";
 
   while(eta>eta_f){
@@ -260,7 +260,7 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
      double truncation_error = abs((1.0/360.0)*(a1) + (-128.0/4275.0)*(a3)+ \
 				   (-2197.0/75240.0)*(a4) + (1.0/50.0)*(a5) + \
 				   (2.0/55.0)*(a6));
-     double epsilon = 50;
+     double epsilon = 0.05;
      
      double new_step_size = 0.9 * dt * pow((epsilon/(truncation_error+0.001)),(1.0/5.0));
      //std::cout << "TE: " << truncation_error << "\n";

@@ -28,7 +28,9 @@ public:
 					     std::vector<double>);
   std::vector<double> axial_ang_mom_carter_constant(std::vector<double>,
 						    std::vector<double>);
-  
+
+  bool determine_location_of_beam(double, double, double,std::vector<double>,
+				  double);
 
 };
 

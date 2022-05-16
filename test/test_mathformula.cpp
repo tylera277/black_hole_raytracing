@@ -35,5 +35,15 @@ TEST_CASE("math formula tests", "[unit]"){
     REQUIRE(MF.Omega(radius2, a2, theta2) == Approx(1/a2));
     std::cout << "VALUE: " << 1/a2 <<"\n";
   }
-  
+}
+
+TEST_CASE("b_zero and q_zero tests", "[unit]"){
+  MathFormula MF;
+
+  SECTION("b_zero"){
+    double result = MF.b_zero(0,5);
+    REQUIRE(result == Approx(5));
+    
+  }
+
 }

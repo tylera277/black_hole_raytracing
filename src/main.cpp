@@ -22,17 +22,17 @@ int main(){
 
   // File which I am outputting the calculations to
   std::ofstream angles;
-  angles.open("../angles_rkf4.csv");
+  angles.open("../angles_rkf4_2.csv");
 
   angles << "theta_cs, phi_cs, theta_prime, phi_prime\n";
 
   
   std::vector<double> cameras_orbital_components;
-  double r_c = 5e6;
-  double theta_c = 3.14159/2.0;
-  double phi_c = 3.14159;
+  double r_c = 2;
+  double theta_c = 3.14159/50000.0;
+  double phi_c = 0;//3.14159;
 
-  double kerr_constant = 1;
+  double kerr_constant = 0.99;
   
   // R, theta, phi of cameras location
   cameras_orbital_components.push_back(r_c);
@@ -54,7 +54,8 @@ int main(){
 
   // The angles from which light rays will emanate w.r.t. the
   // cameras local sky.
-  double theta_cs = 3.14159/2.0, phi_cs =3.14159/2.0;
+  double theta_cs = 3.14159/2.0, phi_cs =3.14159;
+  //double theta_cs =3.14159/2.0, phi_cs = 0;
   
   std::vector<double> cameras_comp_relative_to_fido;
   std::vector<double> cart_comp_inc_ray_cameras_reference;
@@ -69,12 +70,23 @@ int main(){
     -Big B (r,theta,phi) in the paper
    */
   cameras_comp_relative_to_fido = ray_trace.cameras_comp_of_motion_wrt_fido(); 
+
   
+  while(phi_cs <= ((3.14159)+500*((2*3.14159)/picture_width)))
   
-  while(phi_cs <= ((3.14159/2.0)+200*((2*3.14159)/picture_width)))
+  // Use this while loop when calculating for the whole picture
+  //while(phi_cs <= (2*3.14159))
+
     {
-      theta_cs =(3.14159/2.0);
-      while(theta_cs <= ((3.14159/2.0)+200*(3.14159)/picture_height))
+      //theta_cs =(3.14159/2.0);
+      //theta_cs = (3.14159/picture_height);
+      theta_cs=3.14159/2.0;
+      
+      while(theta_cs <= ((3.14159/2.0)+500*((3.14159)/picture_height)))
+
+      // Use this while loop when calculating for whole picture
+      //while(theta_cs <= ((3.14159)))
+	      
   	{
 
 	  
@@ -106,14 +118,21 @@ int main(){
 	  spherical_comp_ray_wrt_fido_reference =
 	    ray_trace.spherical_components_inc_ray_fido_reference(cameras_comp_relative_to_fido,
 								  cart_comp_inc_ray_fido_reference);
-
 	  
+	  //for(int i=0;i<3;i++){
+	  // std::cout <<"nf"<<i<<": "<< spherical_comp_ray_wrt_fido_reference.at(i)<<"\n";
+	  //}
 	  //Step 4a
 	  /*
 	    Computing the rays canonical momenta
 	   */
 	  rays_canonical_momenta = ray_trace.rays_canonical_momenta(cameras_orbital_components,
 								    spherical_comp_ray_wrt_fido_reference);
+	  /*
+	  for(int i=0;i<4;i++){
+	    std::cout <<"p_"<<i<<": "<<rays_canonical_momenta.at(i)<<"\n";
+	  }
+	  */
 	  
 	  //Step 4b
 	  /*
@@ -136,59 +155,69 @@ int main(){
 	   */
 	  //(1May2022) Will come back to do this later.
 
+	  // Boolean which will store the status of whether the light beam comes from the
+	  // horizon or not. The only other possibility at the moment is the celestial sphere.
+	  bool event_horizon;
 	  
-	  //Step 6
-	  /*
-	    If the ray does come from the celestial sphere, now we compute its point of origin there.
-	    -Basically shoot a ray from the camera into the scene at a pair of angles(theta_cs, phi_cs)
-	    and propagate very far back in time to see where it ultimately "hits" the celestial sphere,
-	    you then take the pixel readings at that location and put them into a log as the pixel readings
-	    at its intensity for those pair of initial angles in the camera reference frame.
+	  event_horizon = ray_trace.determine_location_of_beam(b, q, kerr_constant,
+							       rays_canonical_momenta,r_c);
+	  std::cout << "STATUS: " << event_horizon<<"\n";
+	  if (event_horizon == 0){
+	    //Step 6
+	    /*
+	      If the ray does come from the celestial sphere, now we compute its point of origin there.
+	      -Basically shoot a ray from the camera into the scene at a pair of angles(theta_cs, phi_cs)
+	      and propagate very far back in time to see where it ultimately "hits" the celestial sphere,
+	      you then take the pixel readings at that location and put them into a log as the pixel readings
+	      at its intensity for those pair of initial angles in the camera reference frame.
 
-	    -A future step is to adjust the intensity of the light...
+	      -A future step is to adjust the intensity of the light...
 	   */
 
-	  // The angles of the point at which the ray ends up on the celestial sphere
-	  double theta_prime;
-	  double phi_prime;
-	  std::vector<double> celestial_sphere_angle;
+	    // The angles of the point at which the ray ends up on the celestial sphere
+	    double theta_prime;
+	    double phi_prime;
+	    std::vector<double> celestial_sphere_angle;
 
-
-	  // There is definitely a better way to do this than this monstrosity.
-	  std::vector<double> initial_conditions;
-	  initial_conditions.push_back(r_c);
-	  initial_conditions.push_back(theta_cs);
-	  initial_conditions.push_back(phi_cs);
-
-	  initial_conditions.push_back(rays_canonical_momenta.at(1));
-	  initial_conditions.push_back(rays_canonical_momenta.at(2));
-	  initial_conditions.push_back(rays_canonical_momenta.at(3));
 	  
-	  /* 
-	  initial_conditions.insert(initial_conditions.end(),
-				    rays_canonical_momenta.begin(),
-				    rays_canonical_momenta.end());
-	  */
-	  initial_conditions.push_back(kerr_constant);
+	    // There is definitely a better way to do this than this monstrosity.
+	    std::vector<double> initial_conditions;
+	    initial_conditions.push_back(r_c);
+	    initial_conditions.push_back(theta_cs);
+	    initial_conditions.push_back(phi_cs);
 
-	  initial_conditions.push_back(b);
-	  initial_conditions.push_back(q);
+	    initial_conditions.push_back(rays_canonical_momenta.at(1));
+	    initial_conditions.push_back(rays_canonical_momenta.at(2));
+	    initial_conditions.push_back(rays_canonical_momenta.at(3));
 	  
-	  celestial_sphere_angle = ray_equations.integrate_ray_equations(initial_conditions);
+	   
+	    initial_conditions.push_back(kerr_constant);
 
-	  // The angles on the celestial sphere where the ray coming from the camera,
-	  // ultimately ended up.
-	  theta_prime = celestial_sphere_angle.at(0);
-	  phi_prime = celestial_sphere_angle.at(1);
-	  std::cout <<"PHI: " << phi_prime << " THETA: " << theta_prime << "\n";
+	    initial_conditions.push_back(b);
+	    initial_conditions.push_back(q);
+	  
+	    celestial_sphere_angle = ray_equations.integrate_ray_equations(initial_conditions);
+
+	    // The angles on the celestial sphere where the ray coming from the camera,
+	    // ultimately ended up.
+	    theta_prime = celestial_sphere_angle.at(0);
+	    phi_prime = celestial_sphere_angle.at(1);
+	    std::cout <<"PHI: " << phi_prime << " THETA: " << theta_prime << "\n";
 	  
 
-	  // Printing out the angles to a csv file for processing in a
-	  // python file
-	  angles << theta_cs << "," << phi_cs << ",";
-	  angles << theta_prime << "," << phi_prime << "\n";
-	  
+	    // Printing out the angles to a csv file for processing in a
+	    // python file
+	    angles << theta_cs << "," << phi_cs << ",";
+	    angles << theta_prime << "," << phi_prime << "\n";
 
+	  }
+	  else if(event_horizon==1){
+	    std::cout << "MAYBE???\n";
+	    // If the light comes from the event horizon, that pixel needs to be black in the
+	    // resulting image perceived at the cameras location
+	    angles << theta_cs << "," << phi_cs << ",";
+	    angles << 0 << "," << 0 << "\n";
+	  }
 	  
 
 

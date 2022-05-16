@@ -1,6 +1,7 @@
 //Formulas needed during the ray tracing calculations
 
 #include <cmath>
+#include <iostream>
 
 #include "math_formula.hpp"
 
@@ -105,4 +106,77 @@ double MathFormula::energy_f(double radius, double kerr_metric, double theta, do
   return result;
 
 
+}
+
+
+
+double MathFormula::b_zero(double radius, double kerr_metric){
+  
+  double top = pow(radius,3) - (3*pow(radius,2)) + pow(kerr_metric,2)*radius + pow(kerr_metric,2);
+  
+  double bottom = kerr_metric * (radius - 1);
+
+  double result = -top/bottom;
+  return result;
+
+}
+
+double MathFormula::q_zero(double radius, double kerr_metric){
+  double top_first_part = pow(radius,3);
+  double top_second_part = pow(radius,3)-6*pow(radius,2)+9*radius-4*pow(kerr_metric,2);
+
+  double bottom = pow(kerr_metric,2)*pow((radius - 1),2);
+
+  double result = -(top_first_part * top_second_part) / bottom;
+
+  return result;
+
+
+}
+
+double MathFormula::R(double radius, double a, double b, double q){
+  double first_part, second_part, E;
+
+  first_part = pow(radius,4)+pow(a,4)+pow(a,2)*pow(b,2)+2*pow(radius,2)*pow(a,2) -2*pow(radius,2)*a*b-
+    2*pow(a,3)*b;
+
+  E = pow((b-a),2)+q;
+  
+  second_part = -pow(radius,2)*E+2*radius*E+pow(a,2)*E;
+    
+
+  double result = first_part + second_part;
+  
+  return result;
+    
+    
+}
+
+double MathFormula::R_prime(double radius, double a, double b, double q){
+  
+  double E = pow((b-a),2)+q;
+
+  double result = 4*pow(radius,3) + 4*radius*pow(a,2)-4*radius*a*b-2*radius*E + 2*E;
+  
+  return result;
+
+}
+
+double MathFormula::NewtonRaphson(double q, double a, double b,
+					       double initial_guess, double termination_criteria){
+  
+  double current_value = initial_guess;
+  double difference=10000;
+
+  while(difference>termination_criteria){
+    double R_ = this->R(current_value, a, b, q);
+    double R_prime_ = this->R_prime(current_value,a,b,q);
+
+    current_value -= R_/R_prime_;
+    
+    difference = R_/R_prime_;
+    //std::cout << "DIFF:"<< difference<<"\n";
+    //std::cout << "VALUE:" << current_value << "\n";
+  }
+  return current_value;
 }

@@ -64,3 +64,26 @@ TEST_CASE("speed test", "[unit]"){
   }
   
 }
+
+TEST_CASE("FIDO's spherical orthonormal basis", "[unit]"){
+  SECTION("testing kappas value"){
+    
+
+  }
+
+}
+
+
+
+TEST_CASE("zero calculations for determining origin of light beam", "[unit]"){
+  /*
+  RayTracing ray_trace;
+
+  SECTION("testing the speed calculation"){
+    
+    
+
+  }
+  */
+  
+}
