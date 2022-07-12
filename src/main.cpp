@@ -2,9 +2,27 @@
 #include <vector>
 #include <iostream>
 
+#include <omp.h>
 #include "ray_tracing/ray_tracing.hpp"
 #include "ray_tracing/ray_equations/ray_equations.hpp"
 //#include "catch.hpp"
+
+
+
+
+//////////////////////////////////
+//     DEFINITIONS/ACRONYMS     //
+/*
+
+-FIDO: Fiducial Observer
+
+
+
+ */
+
+
+//////////////////////////////////
+
 
 
 
@@ -14,13 +32,38 @@ int main(){
   RayTracing ray_trace;
   RayEquations ray_equations;
 
+<<<<<<< Updated upstream
+=======
+  // Dimensions of the picture which the black hole will be placed
+  // in front of.
+
+  double picture_width=1201;
+  double picture_height=802;
+
+  
+  // File which I am outputting the calculations to
+  std::ofstream angles;
+  angles.open("../outputs/angles_rkf4_openmp_JULY.csv");
+
+  angles << "theta_cs, phi_cs, theta_prime, phi_prime\n";
+
+ 
+  // User-defined values
+>>>>>>> Stashed changes
   std::vector<double> cameras_orbital_components;
   double r_c = 1e11;
   double theta_c = 3.14159/2.0;
   double phi_c = 0;
 
+<<<<<<< Updated upstream
   double kerr_constant = 1;
   
+=======
+  double kerr_constant = 0.99;
+
+
+
+>>>>>>> Stashed changes
   // R, theta, phi of cameras location
   cameras_orbital_components.push_back(r_c);
   cameras_orbital_components.push_back(theta_c);
@@ -30,6 +73,10 @@ int main(){
   cameras_orbital_components.push_back(kerr_constant);
 
 
+
+
+
+  
   //Step 1a
   /*
     Calculating the speed of the camera w.r.t. the FIDO at its location
@@ -41,15 +88,22 @@ int main(){
 
   // The angles from which light rays will emanate w.r.t. the
   // cameras local sky.
+<<<<<<< Updated upstream
   double phi_cs = 3.14159/2.0;
   double theta_cs = 3.14159/2.0;
 
+=======
+  double theta_cs = 3.14159/2.0, phi_cs = 3.14159;
+  //double theta_cs =3.14159/2.0, phi_cs = 0;
+  
+>>>>>>> Stashed changes
   std::vector<double> cameras_comp_relative_to_fido;
   std::vector<double> cart_comp_inc_ray_cameras_reference;
   std::vector<double> cart_comp_inc_ray_fido_reference;
   std::vector<double> spherical_comp_ray_wrt_fido_reference;
   std::vector<double> rays_canonical_momenta;
-  
+
+
 
   //Step 1b
   /*
@@ -57,12 +111,57 @@ int main(){
     -Big B (r,theta,phi) in the paper
    */
   cameras_comp_relative_to_fido = ray_trace.cameras_comp_of_motion_wrt_fido(); 
+<<<<<<< Updated upstream
   
   
   //while(phi_cs < ((2*3.14159)+3.14159/4.0))
   // {
   // while(theta_cs < ((2*3.14159)+3.14159/4.0))
   //	{
+=======
+
+  int horizontal_pixel=0;
+  //while(phi_cs <= ((3.14159)+200*((2*3.14159)/picture_width)))
+  
+  //std::cout << "THREADS_AVAILABLE:" << omp_get_num_threads() << "\n";
+
+  double initial_theta_cs = 3.14159/2.0;
+
+
+  
+#pragma omp parallel for default(none) shared(picture_width, picture_height, \
+					      cameras_orbital_components, kerr_constant, \
+					      cameras_comp_relative_to_fido,r_c,beta_speed, \
+					      std::cout, angles, initial_theta_cs )	\
+  private(cart_comp_inc_ray_fido_reference,cart_comp_inc_ray_cameras_reference,\
+	  spherical_comp_ray_wrt_fido_reference,rays_canonical_momenta,\
+	  ray_equations,ray_trace,theta_cs, phi_cs)
+
+
+
+
+
+
+
+
+    
+  for(int horizontal_pixel=0; horizontal_pixel<200; horizontal_pixel++){
+    
+
+
+    phi_cs = 3.14159+horizontal_pixel*((2*3.14159)/picture_width);
+    
+    theta_cs=initial_theta_cs;
+      
+      
+      for(int vertical_pixel=0; vertical_pixel<200; vertical_pixel++){
+
+	theta_cs = (initial_theta_cs)+vertical_pixel*((3.14159)/picture_height);
+
+
+  	//{
+
+>>>>>>> Stashed changes
 
 	  
 	  //Step 2
@@ -76,6 +175,11 @@ int main(){
 	  cart_comp_inc_ray_cameras_reference =
 	    ray_trace.cartesian_components_inc_ray_cameras_reference(theta_cs, phi_cs);
 
+
+
+
+
+
 	  
 	  
 	  //Step 3a
@@ -86,6 +190,8 @@ int main(){
 	  cart_comp_inc_ray_fido_reference = ray_trace.cartesian_components_inc_ray_fido_reference
 	    (beta_speed, cart_comp_inc_ray_cameras_reference);
 
+
+	  
 	  //Step 3b
 	  /*
 	    Converting step 3a into the FIDO's spherical orthonormal basis.
@@ -95,12 +201,30 @@ int main(){
 								  cart_comp_inc_ray_fido_reference);
 
 	  
+<<<<<<< Updated upstream
+=======
+	  //for(int i=0;i<3;i++){
+	  // std::cout <<"nf"<<i<<": "<< spherical_comp_ray_wrt_fido_reference.at(i)<<"\n";
+	  //}
+
+
+
+
+
+
+	  
+>>>>>>> Stashed changes
 	  //Step 4a
 	  /*
 	    Computing the rays canonical momenta
 	   */
 	  rays_canonical_momenta = ray_trace.rays_canonical_momenta(cameras_orbital_components,
 								    spherical_comp_ray_wrt_fido_reference);
+<<<<<<< Updated upstream
+=======
+	 
+
+>>>>>>> Stashed changes
 	  
 	  //Step 4b
 	  /*
@@ -116,14 +240,16 @@ int main(){
 	  double b = constants.at(0);
 	  double q = constants.at(1);
 
+
+	  
 	  //Step 5
 	  /*
 	    Step for determining if the ray comes from the event horizon (thus is black), or the background
 	    celestial sphere.
 	   */
-	  //(1May2022) Will come back to do this later.
 
 	  
+<<<<<<< Updated upstream
 	  //Step 6
 	  /*
 	    If the ray does come from the celestial sphere, now we compute its point of origin there.
@@ -133,6 +259,28 @@ int main(){
 	    at its intensity for those pair of initial angles in the camera reference frame.
 
 	    -A future step is to adjust the intensity of the light...
+=======
+	  event_horizon = ray_trace.determine_location_of_beam(b, q, kerr_constant,
+							       rays_canonical_momenta,r_c);
+	  std::cout << "STATUS: " << event_horizon<<"\n";
+
+
+	  // I need to change the if condition later to one that only specifies
+	  // it doesnt come from event horizon.
+	  if (event_horizon == 0 || event_horizon == 1){
+
+
+	    
+	    //Step 6
+	    /*
+	      If the ray does come from the celestial sphere, now we compute its point of origin there.
+	      -Basically shoot a ray from the camera into the scene at a pair of angles(theta_cs, phi_cs)
+	      and propagate very far back in time to see where it ultimately "hits" the celestial sphere,
+	      you then take the pixel readings at that location and put them into a log as the pixel readings
+	      at its intensity for those pair of initial angles in the camera reference frame.
+
+	      -A future step is to adjust the intensity of the light...
+>>>>>>> Stashed changes
 	   */
 
 	  // The angles of the point at which the ray ends up on the celestial sphere
@@ -158,8 +306,29 @@ int main(){
 	  */
 	  initial_conditions.push_back(kerr_constant);
 
+<<<<<<< Updated upstream
 	  initial_conditions.push_back(b);
 	  initial_conditions.push_back(q);
+=======
+	    // Printing out the angles to a csv file for processing in a
+	    // python file
+	    angles << theta_cs << "," << phi_cs << ",";
+	    angles << theta_prime << "," << phi_prime << "\n";
+
+	  }
+	  /*
+	  else if(event_horizon==1){
+	    std::cout << "MAYBE???\n";
+	    // If the light comes from the event horizon, that pixel needs to be black in the
+	    // resulting image perceived at the cameras location
+	    angles << theta_cs << "," << phi_cs << ",";
+	    angles << 0 << "," << 0 << "\n";
+	  }
+	  */
+	  
+
+
+>>>>>>> Stashed changes
 	  
 	  celestial_sphere_angle = ray_equations.integrate_ray_equations(initial_conditions);
 
