@@ -1,6 +1,7 @@
 //Formulas needed during the ray tracing calculations
 
 #include <cmath>
+#include <iostream>
 
 #include "math_formula.hpp"
 
@@ -120,8 +121,6 @@ double MathFormula::energy_f(double radius, double kerr_metric, double theta, do
 
   return result;
 }
-<<<<<<< Updated upstream
-=======
 
 
 
@@ -203,4 +202,3 @@ double MathFormula::NewtonRaphson(double q, double a, double b,
   }
   return current_value;
 }
->>>>>>> Stashed changes

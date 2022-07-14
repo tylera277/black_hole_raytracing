@@ -27,38 +27,20 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
   
   // Time conditions which I am integrating over
   double eta = 0;
-  double eta_f = -1e2;
+  double eta_f = -1e8;
 
   // Im going to try a one step size fits all approach, may need to
   // adjust in future.
   // * For the partial derivative estimates * 
-  double partial_der_step_size = 0.0001;
+  double partial_der_step_size = 0.01;
 
   // Step size for time integration
-  double time_step_size = 1;
+  double time_step_size = 100;
   
-  std::cout << "INITIAL ANGLES: "<< theta << " , " << phi << "\n";
 
   while(eta>eta_f){
 
     
-    
-    /*
-    double dr_deta = EOM.dr_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
-    double dtheta_deta = EOM.dtheta_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
-
-    double dphi_deta = EOM.dphi_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
-				     partial_der_step_size);
-
-    double dpr_deta = EOM.dpr_deta(r,theta,kerr_constant,b,q,p_r,p_theta,
-				   partial_der_step_size);
-
-    double dptheta_deta = EOM.dptheta(r,theta,kerr_constant,b,q,p_r,p_theta,
-				      partial_der_step_size);
-				      
-				      
-    */
-
     // Initial Slopes
     double a1 = time_step_size*EOM.dr_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
     double b1 = time_step_size*EOM.dtheta_deta(r,theta,kerr_constant,b,q,p_r,p_theta);
@@ -136,9 +118,17 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
     phi += (1.0/6.0) * (c1 + 2*c2 + 2*c3 + c4);
     p_r += (1.0/6.0) * (d1 + 2*d2 + 2*d3 + d4);
     p_theta += (1.0/6.0) * (e1+ 2*e2 + 2*e3 + e4);
-    
 
-    std::cout << "ANGLES: "<< r << " , " << theta << " , " << phi << "\n";
+    //std::cout << "r: " << r << ";";
+    //std::cout << "theta: " << theta << "; ";
+    //std::cout << "phi: " << phi << "\n";
+    
+    //std::cout << "rad: " << (a1 + 2*a2 + 2*a3 + a4) << "; ";// <<"\n";
+    //std::cout << "theta: " << (b1 + 2*b2 + 2*b3 + b4) <<"; ";
+    //std::cout << "phi: " << (c1 + 2*c2 + 2*c3 + c4) << "\n";
+    //std::cout << "pr: " << (d1 + 2*d2 + 2*d3 + d4) << ";";
+    //std::cout << "ptheta: " <<(e1+ 2*e2 + 2*e3 + e4) << "\n";
+    
     
     eta -= time_step_size;
   }

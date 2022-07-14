@@ -70,7 +70,7 @@ std::vector<double> RayTracing::cartesian_components_inc_ray_fido_reference(doub
   double nfy = nfy_top / nfy_bot;
 
   double nfz_top = -pow(1-pow(beta_speed,2),1.0/2.0) * cart_comp.at(2);
-  double nfz_bot = 1 - beta_speed * cart_comp.at(1);
+  double nfz_bot = 1 - (beta_speed * cart_comp.at(1));
   double nfz = nfz_top / nfz_bot;
 
   std::vector<double> nf;
@@ -86,7 +86,7 @@ std::vector<double> RayTracing::spherical_components_inc_ray_fido_reference(std:
 									    std::vector<double> nf_cartesian){
 
   double kappa_1 = pow(1-B.at(1),1.0/2.0);
-  double kappa_2 = pow(pow(B.at(0),2) + pow(B.at(2),2),1.0/2.0);
+  double kappa_2 = pow(pow(B.at(0),2) + pow(B.at(2),2), 1.0/2.0);
 
   assert(kappa_1 == kappa_2);
   
@@ -99,7 +99,7 @@ std::vector<double> RayTracing::spherical_components_inc_ray_fido_reference(std:
 
   double theta_term_first_part = B.at(1) * nf_cartesian.at(1);
   double theta_term_second_part = kappa_1 * nf_cartesian.at(2);
-  double theta_term = theta_term_first_part + theta_term_second_part;
+  double theta_term = theta_term_first_part - theta_term_second_part;
     
   double phi_term_first_part = -(B.at(0)/kappa_1) * nf_cartesian.at(0);
   double phi_term_second_part = B.at(2) * nf_cartesian.at(1);
@@ -135,7 +135,8 @@ std::vector<double> RayTracing::rays_canonical_momenta(std::vector<double> camer
 
   double p_t = -1;
   
-  double p_r = energy_f * (MF.rho(r_c, kerr_metric, theta_c)/pow(MF.del(r_c, kerr_metric, theta_c),1.0/2.0)) * spherical_comp_ray_wrt_fido_reference.at(0);
+  double p_r = energy_f * (MF.rho(r_c, kerr_metric, theta_c)/pow(MF.del(r_c, kerr_metric, theta_c),1.0/2.0)) \
+    * spherical_comp_ray_wrt_fido_reference.at(0);
 
 			   
   double p_theta = energy_f * MF.rho(r_c, kerr_metric, theta_c) * spherical_comp_ray_wrt_fido_reference.at(1);
@@ -164,10 +165,10 @@ std::vector<double> RayTracing::axial_ang_mom_carter_constant(std::vector<double
   
   
   // Axial angular momentum
-  double b = rays_canonical_momenta.at(2);
+  double b = rays_canonical_momenta.at(3);
 
   // Carter Constant
-  double q = rays_canonical_momenta.at(1) + pow(cos(theta_c),2)*((pow(b,2)/pow(sin(theta_c),2)
+  double q = pow(rays_canonical_momenta.at(2),2) + pow(cos(theta_c),2)*(((pow(b,2)/(pow(sin(theta_c),2)))
 								  - pow(kerr_metric,2)));
 
   std::vector<double> constants;
@@ -175,4 +176,78 @@ std::vector<double> RayTracing::axial_ang_mom_carter_constant(std::vector<double
   constants.push_back(q);
 
   return constants;
+}
+
+bool RayTracing::determine_location_of_beam(double b, double q, double kerr_metric,
+					    std::vector<double> rays_canonical_momenta,
+					    double camera_radius){
+
+  MathFormula MF;
+
+  double r1 = 2 * (1 + cos((2.0/3.0)*acos(-kerr_metric)));
+  double r2 = 2 * (1 + cos((2.0/3.0)*acos(kerr_metric)));
+
+  // b calculations
+  double b_zero_r1 = MF.b_zero(r2, kerr_metric);
+  double b_zero_r2 = MF.b_zero(r1, kerr_metric);
+
+
+  // q calculations
+  double q_zero_b = MF.q_zero(b, kerr_metric);
+
+  double p_r = rays_canonical_momenta.at(1);
+
+  /*
+  std::cout << "r1: "<< r1 << "\n";
+  std::cout << "r2: "<< r2 << "\n";
+
+  std::cout << "p_r: " << rays_canonical_momenta.at(1)<<"\n";
+  
+  std::cout << "b: "<< b << "\n";
+  std::cout << "b_zero_1: "<< b_zero_r1 << "\n";
+  std::cout << "b_zero_2: "<< b_zero_r2 << "\n";
+  
+  
+  std::cout << "q: "<< q << "\n";
+  std::cout << "q_zero_b: "<< q_zero_b << "\n";
+  */
+  
+  // Conditional checking
+  if ((q<q_zero_b) && (b_zero_r1 < b < b_zero_r2))
+    {
+      
+      if(p_r>0){
+	return true;
+      }
+      else if(p_r<0){
+	return false;
+      }
+      
+    }
+  else{
+    std::cout << "ROOTING\n";
+    double initial_guess = 500;
+    double cease_criteria = 0.05;
+    
+    double root = MF.NewtonRaphson(q,
+				   kerr_metric,
+				   b,
+				   initial_guess,
+				   cease_criteria);
+    
+    std::cout <<"ROOT: " << root << "\n";
+
+    if(camera_radius >= root){
+      return false;
+    }
+    else{
+      return true;
+    }
+    
+
+  }
+
+  
+  
+
 }

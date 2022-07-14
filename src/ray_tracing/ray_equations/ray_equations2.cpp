@@ -46,7 +46,7 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
   double pdss = partial_der_step_size;
 
   // Step size for time integration
-  double time_step_size = 100;
+  double time_step_size = 1E6;
   double dt = time_step_size;
   
   std::cout << "INITIAL ANGLES: " << theta <<"; " << phi<<"\n";
@@ -264,29 +264,32 @@ std::vector<double> RayEquations::integrate_ray_equations(std::vector<double>
 
      //////////////////////////////////
      //Updating the values
-
-     r += (47.0/450.0)*a1 + (0)*a2 + (12.0/25.0)*a3 + (32.0/225.0)*a4 + (1.0/30.0)*a5 + (6.0/25.0)*a6;
-     theta += (47.0/450.0)*b1 + (0)*b2 + (12.0/25.0)*b3 + (32.0/225.0)*b4 + (1.0/30.0)*b5 + (6.0/25.0)*b6;
-     phi += (47.0/450.0)*c1 + (0)*c2 + (12.0/25.0)*c3 + (32.0/225.0)*c4 + (1.0/30.0)*c5 + (6.0/25.0)*c6;
-     p_r += (47.0/450.0)*d1 + (0)*d2 + (12.0/25.0)*d3 + (32.0/225.0)*d4 + (1.0/30.0)*d5 + (6.0/25.0)*d6;
-     p_theta += (47.0/450.0)*e1 + (0)*e2 + (12.0/25.0)*e3 + (32.0/225.0)*e4 + (1.0/30.0)*e5 + (6.0/25.0)*e6;
+     double CH1 = 16.0/135.0;
+     double CH2 = 0;
+     double CH3 = 6656.0/12825.0;
+     double CH4 = 28561.0/56430.0;
+     double CH5 = -9.0/50.0;
+     double CH6 = 2.0/55.0;
+     
+     r += (CH1*a1 + CH2*a2 + CH3*a3 + CH4*a4 + CH5*a5 + CH6*a6);
+     theta += (CH1*b1 + CH2*b2 + CH3*b3 + CH4*b4 + CH5*b5 + CH6*b6);
+     phi += (CH1*c1 + CH2*c2 + CH3*c3 + CH4*c4 + CH5*c5 + CH6*c6);
+     p_r += (CH1*d1 + CH2*d2 + CH3*d3 + CH4*d4 + CH5*d5 + CH6*d6);
+     p_theta += (CH1*e1 + CH2*e2 + CH3*e3 + CH4*e4 + CH5*e5 + CH6*e6);
 
      //std::cout << "VALU: " << r << "; " << theta << "; " << phi << "\n";
      // Maybe calculating the truncation error for this problem
-     /*
+     
      double truncation_error = abs((1.0/360.0)*(a1+b1+c1+d1+e1) + (-128.0/4275.0)*(a3+b3+c3+d3+e3)+ \
 				   (-2197.0/75240.0)*(a4+b4+c4+d4+e4) + (1.0/50.0)*(a5+b5+c5+d5+e5) + \
 				   (2.0/55.0)*(a6+b6+c6+d6+e6));
-     */
-     double truncation_error = abs((1.0/360.0)*(a1) + (-128.0/4275.0)*(a3)+ \
-				   (-2197.0/75240.0)*(a4) + (1.0/50.0)*(a5) + \
-				   (2.0/55.0)*(a6));
+     
      double epsilon = 0.5;
      
      double new_step_size = 0.9 * dt * pow((epsilon/(truncation_error+0.001)),(1.0/5.0));
      //std::cout << "TE: " << truncation_error << "\n";
      //std::cout << "STEPPER: " << new_step_size << "\n";
-     //std::cout << "TIME: " << eta_f << "\n";
+     //std::cout << "TIME: " << eta << "\n";
 					      
      if(truncation_error > epsilon)
        {
