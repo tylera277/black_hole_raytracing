@@ -1,5 +1,7 @@
 # black_hole_raytracing
 
+* Current branch that is being worked on is the open_mp one.*. 
+
 Full ray traced render computed on 11May2022. This is the most recent status of the program. This is missing the black parts of the black hole, where light cant escape, as well as the shift in light intensity around the black hole.  
 -Am following the steps given by the paper of Kip Thorne and Double Negative for what they utilized in the movie Interstellar.
 
